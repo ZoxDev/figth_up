@@ -10,7 +10,7 @@ public sealed class PlayerController2D : Component, Component.INetworkSpawn
 	[Property] float Speed { get; set; } = 200f;
 	[Property] public float GroundFriction { get; set; } = 4.0f;
 	[Property] public float AirFriction { get; set; } = 0.5f;
-	[Property] public float JumpForce { get; set; } = 400f;
+	[Property] public float JumpForce { get; set; } = 1000f;
 
 	[Property] public Rigidbody Rigidbody;
 
@@ -18,6 +18,19 @@ public sealed class PlayerController2D : Component, Component.INetworkSpawn
 	[RequireComponent] CitizenAnimationHelper AnimationHelper { get; set; }
 
 	private GameObject _body { get; set; }
+
+	public static PlayerController2D LocalPlayer
+	{
+		get
+		{
+			if ( !_local.IsValid() )
+			{
+				_local = Game.ActiveScene.GetAllComponents<PlayerController2D>().FirstOrDefault( x => x.Network.IsOwner );
+			}
+			return _local;
+		}
+	}
+	private static PlayerController2D _local = null;
 
 	void INetworkSpawn.OnNetworkSpawn( Connection owner )
 	{
@@ -80,7 +93,6 @@ public sealed class PlayerController2D : Component, Component.INetworkSpawn
 
 		var mousePosition = getMousePosition();
 
-		Log.Info( mousePosition );
 		LookAt( mousePosition );
 	}
 
@@ -98,11 +110,6 @@ public sealed class PlayerController2D : Component, Component.INetworkSpawn
 	void Jump()
 	{
 		CharacterController.Punch( Vector3.Up * JumpForce );
-		AnimateJump();
-	}
-
-	void AnimateJump()
-	{
 		AnimationHelper.TriggerJump();
 	}
 
@@ -113,7 +120,7 @@ public sealed class PlayerController2D : Component, Component.INetworkSpawn
 		if ( mousePosition.x == 0 ) return;
 
 		_body.WorldRotation = Rotation.LookAt( directionX ).Angles();
-		AnimationHelper.WithLook( new Vector3( 0, 0, -mousePosition.y - EYE_POSITION_Z ) );
+		AnimationHelper.WithLook( new Vector3( 0, -mousePosition.x, -mousePosition.y - EYE_POSITION_Z ) );
 	}
 
 	const float EYE_POSITION_Z = 60f;
