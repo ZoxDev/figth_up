@@ -4,7 +4,7 @@ using System.Text.Json;
 using Sandbox;
 using Sandbox.Citizen;
 
-public sealed class PlayerController2D : Component, Component.INetworkSpawn
+public sealed class PlayerController2D : Component, Component.INetworkSpawn, Component.ICollisionListener
 {
 
 	[Property] float Speed { get; set; } = 200f;
@@ -53,19 +53,27 @@ public sealed class PlayerController2D : Component, Component.INetworkSpawn
 	{
 		var wishVelocity = getWishVelocity();
 		Move( wishVelocity );
+
 		if ( Input.Pressed( "Jump" ) && CharacterController.IsOnGround )
 		{
 			Jump();
 		}
 
-		getMousePosition();
+		if ( Input.Pressed( "Backward" ) && !CharacterController.IsOnGround )
+		{
+			FastFall();
+		}
+		if ( isFastFalling && CharacterController.IsOnGround )
+		{
+			AnimationHelper.SpecialMove = CitizenAnimationHelper.SpecialMoveStyle.None;
+			isFastFalling = false;
+		}
 	}
 
 	Vector3 getWishVelocity()
 	{
 		Vector3 analogMove = Input.AnalogMove;
 		Vector3 wishVelocity = -analogMove.WithX( 0 ).WithZ( 0 ) * Speed;
-
 
 		return wishVelocity;
 	}
@@ -89,10 +97,13 @@ public sealed class PlayerController2D : Component, Component.INetworkSpawn
 		CharacterController.UseCollisionRules = true;
 		CharacterController.Move();
 
-		AnimateMove( wishVelocity );
+		if ( !isFastFalling )
+		{
+			AnimateMove( wishVelocity );
+		}
 
-		var mousePosition = getMousePosition();
 
+		var mousePosition = _getMousePosition();
 		LookAt( mousePosition );
 	}
 
@@ -107,12 +118,6 @@ public sealed class PlayerController2D : Component, Component.INetworkSpawn
 		AnimationHelper.MoveStyle = CitizenAnimationHelper.MoveStyles.Run;
 	}
 
-	void Jump()
-	{
-		CharacterController.Punch( Vector3.Up * JumpForce );
-		AnimationHelper.TriggerJump();
-	}
-
 	void LookAt( Vector2 mousePosition )
 	{
 		Vector3 directionX = new Vector3( 0, mousePosition.Normal.x, 0 );
@@ -123,8 +128,28 @@ public sealed class PlayerController2D : Component, Component.INetworkSpawn
 		AnimationHelper.WithLook( new Vector3( 0, -mousePosition.x, -mousePosition.y - EYE_POSITION_Z ) );
 	}
 
+	void Jump()
+	{
+		CharacterController.Punch( Vector3.Up * JumpForce );
+		AnimationHelper.TriggerJump();
+	}
+
+	bool isFastFalling { get; set; } = false;
+	void FastFall()
+	{
+		float characterFallingVelocity = CharacterController.Velocity.z;
+		if ( characterFallingVelocity <= 100 && characterFallingVelocity >= -100 )
+		{
+			isFastFalling = true;
+			CharacterController.Punch( Vector3.Down * 1000 );
+
+			AnimationHelper.SpecialMove = CitizenAnimationHelper.SpecialMoveStyle.Roll;
+			AnimationHelper.HoldType = CitizenAnimationHelper.HoldTypes.None;
+		}
+	}
+
 	const float EYE_POSITION_Z = 60f;
-	Vector2 getMousePosition()
+	private Vector2 _getMousePosition()
 	{
 		var screenCenter = new Vector2( Screen.Size.x, Screen.Size.y ) * 0.5f;
 		var mousePosition = new Vector2( Mouse.Position.x, Mouse.Position.y );
