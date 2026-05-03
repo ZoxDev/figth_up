@@ -124,7 +124,8 @@ public sealed class PlayerController2D : Component, Component.INetworkSpawn, Com
 
 		if ( mousePosition.x == 0 ) return;
 
-		_body.WorldRotation = Rotation.LookAt( directionX ).Angles();
+		var target = Rotation.LookAt( directionX );
+		_body.WorldRotation = Rotation.Lerp( _body.WorldRotation, target, Time.Delta * 15f );
 		AnimationHelper.WithLook( new Vector3( 0, -mousePosition.x, -mousePosition.y - EYE_POSITION_Z ) );
 	}
 
