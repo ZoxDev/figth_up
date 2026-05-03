@@ -5,6 +5,14 @@ public sealed class PlatformCollider : Component, Component.ITriggerListener
 	[Property] BoxCollider platformCollider { get; set; }
 	[Property] int health { get; set; } = 3;
 
+	private ModelRenderer _modelRenderer { get; set; }
+
+	protected override void OnStart()
+	{
+		base.OnStart();
+		_modelRenderer = GameObject.GetComponent<ModelRenderer>();
+	}
+
 	void ITriggerListener.OnTriggerEnter( Collider other )
 	{
 		GameObject collidedGameObject = other.GameObject;
@@ -28,6 +36,7 @@ public sealed class PlatformCollider : Component, Component.ITriggerListener
 	protected override void OnUpdate()
 	{
 		base.OnUpdate();
+		if ( health == 1 ) _modelRenderer.Tint = "#ff4747";
 		if ( health == 0 ) GameObject.Destroy();
 	}
 }

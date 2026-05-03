@@ -1,6 +1,7 @@
 using System;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
+
 using Sandbox;
 using Sandbox.Citizen;
 
@@ -11,11 +12,12 @@ public sealed class PlayerController2D : Component, Component.INetworkSpawn, Com
 	[Property] public float GroundFriction { get; set; } = 4.0f;
 	[Property] public float AirFriction { get; set; } = 0.5f;
 	[Property] public float JumpForce { get; set; } = 1000f;
-
+	[Property] CitizenAnimationHelper AnimationHelper { get; set; }
 	[Property] public Rigidbody Rigidbody;
 
 	[RequireComponent] CharacterController CharacterController { get; set; }
-	[RequireComponent] CitizenAnimationHelper AnimationHelper { get; set; }
+
+	public const float EYE_POSITION_Z = 60f;
 
 	private GameObject _body { get; set; }
 
@@ -94,6 +96,9 @@ public sealed class PlayerController2D : Component, Component.INetworkSpawn, Com
 			CharacterController.Accelerate( wishVelocity );
 			CharacterController.ApplyFriction( AirFriction );
 		}
+		// lock x axis movement
+		GameObject.WorldPosition = GameObject.WorldPosition.WithX( 0 );
+
 		CharacterController.UseCollisionRules = true;
 		CharacterController.Move();
 
@@ -102,8 +107,7 @@ public sealed class PlayerController2D : Component, Component.INetworkSpawn, Com
 			AnimateMove( wishVelocity );
 		}
 
-
-		var mousePosition = _getMousePosition();
+		var mousePosition = PlayerUtils.GetMousePosition();
 		LookAt( mousePosition );
 	}
 
@@ -125,7 +129,7 @@ public sealed class PlayerController2D : Component, Component.INetworkSpawn, Com
 		if ( mousePosition.x == 0 ) return;
 
 		var target = Rotation.LookAt( directionX );
-		_body.WorldRotation = Rotation.Lerp( _body.WorldRotation, target, Time.Delta * 15f );
+		_body.WorldRotation = Rotation.Slerp( _body.WorldRotation, target, Time.Delta * 15f );
 		AnimationHelper.WithLook( new Vector3( 0, -mousePosition.x, -mousePosition.y - EYE_POSITION_Z ) );
 	}
 
@@ -138,23 +142,22 @@ public sealed class PlayerController2D : Component, Component.INetworkSpawn, Com
 	bool isFastFalling { get; set; } = false;
 	void FastFall()
 	{
-		float characterFallingVelocity = CharacterController.Velocity.z;
-		if ( characterFallingVelocity <= 100 && characterFallingVelocity >= -100 )
-		{
-			isFastFalling = true;
-			CharacterController.Punch( Vector3.Down * 1000 );
+		Vector3 traceFrom = GameObject.WorldPosition;
+		Vector3 traceTo = traceFrom + Vector3.Down * 200;
 
-			AnimationHelper.SpecialMove = CitizenAnimationHelper.SpecialMoveStyle.Roll;
-			AnimationHelper.HoldType = CitizenAnimationHelper.HoldTypes.None;
-		}
-	}
+		DebugOverlay.Line( new Line( traceFrom, traceTo ), Color.Blue, 5f );
+		SceneTraceResult trace = Scene.Trace.Ray( traceFrom, traceTo )
+			.IgnoreGameObjectHierarchy( GameObject )
+			.WithoutTags( ["player"] )
+			.HitTriggers()
+			.Run();
 
-	const float EYE_POSITION_Z = 60f;
-	private Vector2 _getMousePosition()
-	{
-		var screenCenter = new Vector2( Screen.Size.x, Screen.Size.y ) * 0.5f;
-		var mousePosition = new Vector2( Mouse.Position.x, Mouse.Position.y );
+		if ( trace.Hit ) return;
 
-		return new Vector2( mousePosition - screenCenter - new Vector2( 0, EYE_POSITION_Z ) );
+		isFastFalling = true;
+		CharacterController.Punch( Vector3.Down * 1000 );
+
+		AnimationHelper.SpecialMove = CitizenAnimationHelper.SpecialMoveStyle.Roll;
+		AnimationHelper.HoldType = CitizenAnimationHelper.HoldTypes.None;
 	}
 }
