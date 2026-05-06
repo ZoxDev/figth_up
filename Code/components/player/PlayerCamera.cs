@@ -12,6 +12,6 @@ public sealed class PlayerCamera : Component
 
 	protected override void OnUpdate()
 	{
-		cameraGameObject.WorldPosition = playerBody.WorldPosition - new Vector3( -800f, 0f, -65f );
+		cameraGameObject.WorldPosition = playerBody.WorldPosition - new Vector3( -1250f, 0f, -65f );
 	}
 }

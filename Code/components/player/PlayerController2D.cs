@@ -11,7 +11,7 @@ public sealed class PlayerController2D : Component, Component.INetworkSpawn, Com
 	[Property] float Speed { get; set; } = 200f;
 	[Property] public float GroundFriction { get; set; } = 4.0f;
 	[Property] public float AirFriction { get; set; } = 0.5f;
-	[Property] public float JumpForce { get; set; } = 1000f;
+	[Property] public float JumpForce { get; set; } = 1250;
 	[Property] CitizenAnimationHelper AnimationHelper { get; set; }
 	[Property] public Rigidbody Rigidbody;
 

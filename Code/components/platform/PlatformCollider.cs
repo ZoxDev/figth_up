@@ -3,7 +3,7 @@ using Sandbox;
 public sealed class PlatformCollider : Component, Component.ITriggerListener
 {
 	[Property] BoxCollider platformCollider { get; set; }
-	[Property] int health { get; set; } = 3;
+	[Property] int health { get; set; } = 4;
 
 	private ModelRenderer _modelRenderer { get; set; }
 
