@@ -1,11 +1,11 @@
 
 ### platform
+- bug: you can't pass throught some platform sometimes
 - smaller platform
 - textures
 - different types ? 
 
 ### platform-manager
-- stop using box to spawn platform use line on x and y axis
 - create worldpanel to show the spawn platforn spawn range
 
 ### death zone

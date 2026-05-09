@@ -64,6 +64,7 @@ public sealed class PlatformManager : Component
 	record XCord( int Left, int Right );
 	record YCord( int Top, int Bottom );
 	private int _lastPlatformOnY { get; set; }
+	const int MAX_ATTEMPTS = 20;
 	private void SpawnPlatform()
 	{
 		_nextPlatformSpawn = 1;
@@ -80,23 +81,45 @@ public sealed class PlatformManager : Component
 		YCord yCord = new( top, bottom > _lastPlatformOnY ? bottom : _lastPlatformOnY );
 
 		Random random = new();
-		int randomX = random.Next( xCord.Left, xCord.Right );
-		int randomY = random.Next( yCord.Bottom, yCord.Top );
 
-		Vector3 center = new( 0, randomX, randomY );
-		Vector3 halfExtents = new( BoxTraceHalfSize, BoxTraceHalfSize * 5f, BoxTraceHalfSize );
-
-		SceneTraceResult traceBox = Scene.Trace.Box( halfExtents, center, center ).WithTag( "platform" ).HitTriggers().Run();
-		DebugOverlay.Box( BBox.FromPositionAndSize( center, halfExtents * 2 ), Color.Green, 1.0f );
-
-		Log.Info( traceBox.Hit );
-		if ( traceBox.Hit )
+		for ( int attempt = 0; attempt < MAX_ATTEMPTS; attempt++ )
 		{
-			SpawnPlatform();
+
+			Log.Info( attempt );
+			int randomX = random.Next( xCord.Left, xCord.Right );
+			int randomY = random.Next( yCord.Bottom, yCord.Top );
+
+			Vector3 horizontalTraceFrom = new( 0, randomX - 500, randomY );
+			Vector3 horizontalTraceTo = new( 0, randomX + 500, randomY );
+
+			SceneTraceResult horizontalTrace = Scene.Trace
+				.Ray( horizontalTraceFrom, horizontalTraceTo )
+				.WithTag( "platform" )
+				.HitTriggers()
+				.Run();
+
+			DebugOverlay.Line( new Line( horizontalTraceFrom, horizontalTraceTo ), Color.Orange, 5f );
+
+
+			Vector3 verticalTraceFrom = new( 0, randomX, randomY + 500 );
+			Vector3 verticalTraceTo = new( 0, randomX, randomY - 500 );
+
+			SceneTraceResult verticalTrace = Scene.Trace
+				.Ray( verticalTraceFrom, verticalTraceTo )
+				.WithTag( "platform" )
+				.HitTriggers()
+				.Run();
+
+			DebugOverlay.Line( new Line( verticalTraceFrom, verticalTraceTo ), Color.Orange, 5f );
+
+
+			if ( horizontalTrace.Hit || verticalTrace.Hit )
+				continue;
+
+			_lastPlatformOnY = randomY;
+			PlatformPrefab.Clone( new Vector3( 0, randomX, randomY ) );
+
 			return;
 		}
-
-		_lastPlatformOnY = randomY;
-		PlatformPrefab.Clone( new Vector3( 0, randomX, randomY ) );
 	}
 }
