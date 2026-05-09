@@ -1,4 +1,8 @@
 
+### player
+- bug: can spam fastfal
+- death
+
 ### platform
 - bug: you can't pass throught some platform sometimes
 - smaller platform
@@ -6,7 +10,7 @@
 - different types ? 
 
 ### platform-manager
-- create worldpanel to show the spawn platforn spawn range
+- check if it's always reachable (jump + going left / right ) + log
 
 ### death zone
 - implement death zone

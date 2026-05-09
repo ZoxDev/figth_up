@@ -1,28 +1,21 @@
 using System;
 using System.Diagnostics;
-using System.Dynamic;
-using System.Numerics;
-using System.Security.Cryptography;
-
-using Sandbox;
 
 public sealed class PlatformManager : Component
 {
+	[Property] bool ShowDebug { get; set; } = false;
 	[Property] GameObject PlatformPrefab { get; set; }
-	[Property] Vector3 BoxScale { get; set; } = new Vector3( 1, 20, 10 );
+	[Property] Vector3 BoxScale { get; set; } = new Vector3( 1, 10, 5 );
 	[Property] int MaxSumToRange { get; set; } = 5;
-	[Property] int BoxTraceHalfSize = 125;
-
-	private BoxCollider _boxCollider { get; set; }
-	private ModelRenderer _boxModel { get; set; }
-
 	private TimeSince _gameStart { get; set; }
 	private TimeUntil _nextPlatformSpawn { get; set; }
+	private WorldPanel _worldPanel { get; set; }
+
+	const float PixelsPerUnit = 100f;
 	protected override void OnAwake()
 	{
 		base.OnAwake();
-		_boxCollider = AddComponent<BoxCollider>();
-		_boxModel = AddComponent<ModelRenderer>();
+		_worldPanel = GetComponentInChildren<WorldPanel>();
 		_gameStart = 0;
 		_nextPlatformSpawn = 0;
 
@@ -43,21 +36,14 @@ public sealed class PlatformManager : Component
 
 	private void SetupBox()
 	{
-		WorldPosition = new Vector3( 0, 0, WorldPosition.z + (BoxScale.z * 25) );
-
-		_boxCollider.IsTrigger = true;
-		_boxCollider.Scale = BoxScale;
-
-		_boxModel.Model = Model.Load( "models/dev/box.vmdl" );
-		_boxModel.WorldScale = BoxScale;
-		_boxModel.Tint = Color.Green.WithAlpha( 0.05f );
+		_worldPanel.AddComponent<PlatformManagerUi>();
+		GameObject.WorldScale = BoxScale;
 	}
 
 	private void MoveBox()
 	{
 		float sumRange = _gameStart.Relative > MaxSumToRange ? MaxSumToRange : _gameStart.Relative;
 		Vector3 target = new( WorldPosition.x, WorldPosition.y, WorldPosition.z + sumRange / 2 );
-
 		WorldPosition = target;
 	}
 
@@ -69,13 +55,17 @@ public sealed class PlatformManager : Component
 	{
 		_nextPlatformSpawn = 1;
 
-		float xWidth = BoxScale.y;
-		float yWidth = BoxScale.z;
+		float halfWidth = BoxScale.y * PixelsPerUnit * 0.5f;
+		float halfHeight = BoxScale.z * PixelsPerUnit * 0.5f;
 
-		int left = (int)Math.Round( GameObject.WorldPosition.y - (xWidth * 25) );
-		int right = (int)Math.Round( GameObject.WorldPosition.y + (xWidth * 25) );
-		int top = (int)Math.Round( GameObject.WorldPosition.z + (yWidth * 25) );
-		int bottom = (int)Math.Round( GameObject.WorldPosition.z - (yWidth * 25) );
+		int left = (int)Math.Round( GameObject.WorldPosition.y - halfWidth );
+		int right = (int)Math.Round( GameObject.WorldPosition.y + halfWidth );
+		int top = (int)Math.Round( GameObject.WorldPosition.z + halfHeight );
+		int bottom = (int)Math.Round( GameObject.WorldPosition.z - halfHeight );
+
+		Log.Info( $"left: {left}, right: {right}" );
+		Log.Info( $"top: {top}, bottom: {bottom}" );
+
 
 		XCord xCord = new( left, right );
 		YCord yCord = new( top, bottom > _lastPlatformOnY ? bottom : _lastPlatformOnY );
@@ -84,13 +74,11 @@ public sealed class PlatformManager : Component
 
 		for ( int attempt = 0; attempt < MAX_ATTEMPTS; attempt++ )
 		{
-
-			Log.Info( attempt );
 			int randomX = random.Next( xCord.Left, xCord.Right );
 			int randomY = random.Next( yCord.Bottom, yCord.Top );
 
-			Vector3 horizontalTraceFrom = new( 0, randomX - 500, randomY );
-			Vector3 horizontalTraceTo = new( 0, randomX + 500, randomY );
+			Vector3 horizontalTraceFrom = new( 0, randomX - 250, randomY );
+			Vector3 horizontalTraceTo = new( 0, randomX + 250, randomY );
 
 			SceneTraceResult horizontalTrace = Scene.Trace
 				.Ray( horizontalTraceFrom, horizontalTraceTo )
@@ -98,11 +86,8 @@ public sealed class PlatformManager : Component
 				.HitTriggers()
 				.Run();
 
-			DebugOverlay.Line( new Line( horizontalTraceFrom, horizontalTraceTo ), Color.Orange, 5f );
-
-
-			Vector3 verticalTraceFrom = new( 0, randomX, randomY + 500 );
-			Vector3 verticalTraceTo = new( 0, randomX, randomY - 500 );
+			Vector3 verticalTraceFrom = new( 0, randomX, randomY + 250 );
+			Vector3 verticalTraceTo = new( 0, randomX, randomY - 250 );
 
 			SceneTraceResult verticalTrace = Scene.Trace
 				.Ray( verticalTraceFrom, verticalTraceTo )
@@ -110,8 +95,11 @@ public sealed class PlatformManager : Component
 				.HitTriggers()
 				.Run();
 
-			DebugOverlay.Line( new Line( verticalTraceFrom, verticalTraceTo ), Color.Orange, 5f );
-
+			if ( ShowDebug )
+			{
+				DebugOverlay.Line( new Line( horizontalTraceFrom, horizontalTraceTo ), Color.Orange, 5f );
+				DebugOverlay.Line( new Line( verticalTraceFrom, verticalTraceTo ), Color.Orange, 5f );
+			}
 
 			if ( horizontalTrace.Hit || verticalTrace.Hit )
 				continue;
