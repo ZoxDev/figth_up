@@ -4,9 +4,11 @@ using Sandbox.Citizen;
 
 public sealed class PlayerCombat : Component, Component.IDamageable
 {
-	[Property] float health { get; set; } = 100;
+	[Property] public float Health { get; set; } = 100;
 	[Property] CitizenAnimationHelper AnimationHelper { get; set; }
 	[Property] CharacterController CharacterController { get; set; }
+	[Property] CharacterController Body { get; set; }
+
 
 	TimeUntil nextAttack = 0;
 	protected override void OnUpdate()
@@ -18,9 +20,15 @@ public sealed class PlayerCombat : Component, Component.IDamageable
 		}
 	}
 
+	// TODO: red blink animation
+	public void LoseHealthAnimation()
+	{
+
+	}
+
 	void IDamageable.OnDamage( in DamageInfo damage )
 	{
-		health -= damage.Damage;
+		Health -= damage.Damage;
 
 		Vector3 damagePosition = damage.Position;
 		bool damageFromLeft = damagePosition.y < GameObject.WorldPosition.y;

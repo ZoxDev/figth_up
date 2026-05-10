@@ -43,6 +43,25 @@
         "Tint": "1,0.84767,0.3907,1"
       },
       {
+        "__type": "PlatformCollider",
+        "__guid": "609ae207-c1bd-4692-85cd-56a7cb41bc36",
+        "__enabled": true,
+        "Flags": 0,
+        "Health": 4,
+        "OnComponentDestroy": null,
+        "OnComponentDisabled": null,
+        "OnComponentEnabled": null,
+        "OnComponentFixedUpdate": null,
+        "OnComponentStart": null,
+        "OnComponentUpdate": null,
+        "PlatformColliderBox": {
+          "_type": "component",
+          "component_id": "3155089a-362e-4e38-bef4-51891cf29fe2",
+          "go": "719c35ab-214b-476e-a123-01c88765449b",
+          "component_type": "BoxCollider"
+        }
+      },
+      {
         "__type": "Sandbox.BoxCollider",
         "__guid": "3155089a-362e-4e38-bef4-51891cf29fe2",
         "__enabled": true,
@@ -67,25 +86,6 @@
         "Static": false,
         "Surface": null,
         "SurfaceVelocity": "0,0,0"
-      },
-      {
-        "__type": "PlatformCollider",
-        "__guid": "609ae207-c1bd-4692-85cd-56a7cb41bc36",
-        "__enabled": true,
-        "Flags": 0,
-        "health": 3,
-        "OnComponentDestroy": null,
-        "OnComponentDisabled": null,
-        "OnComponentEnabled": null,
-        "OnComponentFixedUpdate": null,
-        "OnComponentStart": null,
-        "OnComponentUpdate": null,
-        "platformCollider": {
-          "_type": "component",
-          "component_id": "3155089a-362e-4e38-bef4-51891cf29fe2",
-          "go": "719c35ab-214b-476e-a123-01c88765449b",
-          "component_type": "BoxCollider"
-        }
       },
       {
         "__type": "Sandbox.BoxCollider",

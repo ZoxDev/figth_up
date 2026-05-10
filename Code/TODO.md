@@ -1,6 +1,7 @@
 
 ### player
 - death
+- red blink animation
 
 ### platform
 - smaller platform

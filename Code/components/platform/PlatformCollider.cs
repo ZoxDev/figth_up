@@ -2,8 +2,8 @@ using Sandbox;
 
 public sealed class PlatformCollider : Component, Component.ITriggerListener
 {
-	[Property] BoxCollider platformCollider { get; set; }
-	[Property] int health { get; set; } = 4;
+	[Property] BoxCollider PlatformColliderBox { get; set; }
+	[Property] int Health { get; set; } = 4;
 
 	private ModelRenderer _modelRenderer { get; set; }
 
@@ -24,19 +24,19 @@ public sealed class PlatformCollider : Component, Component.ITriggerListener
 		float characterUpwardVelocity = characterController.Velocity.z;
 		if ( characterUpwardVelocity > 0 )
 		{
-			platformCollider.IsTrigger = true;
+			PlatformColliderBox.IsTrigger = true;
 		}
 		else
 		{
-			health--;
-			platformCollider.IsTrigger = false;
+			Health--;
+			PlatformColliderBox.IsTrigger = false;
 		}
 	}
 
 	protected override void OnUpdate()
 	{
 		base.OnUpdate();
-		if ( health == 1 ) _modelRenderer.Tint = "#ff4747";
-		if ( health == 0 ) GameObject.Destroy();
+		if ( Health == 1 ) _modelRenderer.Tint = "#ff4747";
+		if ( Health == 0 ) GameObject.Destroy();
 	}
 }

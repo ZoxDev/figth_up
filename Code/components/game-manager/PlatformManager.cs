@@ -5,7 +5,7 @@ public sealed class PlatformManager : Component
 {
 	[Property] bool ShowDebug { get; set; } = false;
 	[Property] GameObject PlatformPrefab { get; set; }
-	[Property] Vector3 BoxScale { get; set; } = new Vector3( 1, 10, 5 );
+	[Property] public Vector3 BoxScale { get; set; } = new Vector3( 1, 10, 5 );
 	[Property] int MaxSumToRange { get; set; } = 5;
 	private TimeSince _gameStart { get; set; }
 	private TimeUntil _nextPlatformSpawn { get; set; }
