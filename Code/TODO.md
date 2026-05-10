@@ -3,7 +3,6 @@
 - death
 
 ### platform
-- bug: you can't pass throught some platform sometimes
 - smaller platform
 - textures
 - different types ? 
