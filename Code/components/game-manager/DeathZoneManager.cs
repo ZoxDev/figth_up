@@ -5,15 +5,17 @@ using Sandbox;
 public sealed class DeathZoneManager : Component, Component.ITriggerListener
 {
 	[Property] Vector3 CollidersScale { get; set; }
+	[Property] Model BoxModel { get; set; }
 	private PlatformManager _platformManager;
 	private TimeSince _gameStart;
 	private BoxCollider _leftSide;
 	private BoxCollider _rightSide;
 	private BoxCollider _bottomSide;
 	private PlayerCombat _playerCombat;
-	private float _colliderWidth;
-	private float _colliderHeight;
 	const float PixelsPerUnit = 100f;
+	private GameObject _leftSideGo;
+	private GameObject _rightSideGo;
+	private GameObject _bottomSideGo;
 
 	protected override void OnStart()
 	{
@@ -27,13 +29,8 @@ public sealed class DeathZoneManager : Component, Component.ITriggerListener
 
 		_gameStart = 0;
 
-		_leftSide = GameObject.AddComponent<BoxCollider>();
-		_rightSide = GameObject.AddComponent<BoxCollider>();
-		_bottomSide = GameObject.AddComponent<BoxCollider>();
-
-		_colliderWidth = CollidersScale.y;
-		_colliderHeight = CollidersScale.z;
 		SetupColliders();
+		SetupColliderModel();
 	}
 
 	protected override void OnFixedUpdate()
@@ -51,7 +48,6 @@ public sealed class DeathZoneManager : Component, Component.ITriggerListener
 		if ( nextDeathZoneDamages && isInDeathzone ) DeathZoneDamage();
 	}
 
-	TimeSince exitDeathZone;
 	bool isInDeathzone;
 	void ITriggerListener.OnTriggerEnter( GameObject other )
 	{
@@ -68,7 +64,6 @@ public sealed class DeathZoneManager : Component, Component.ITriggerListener
 	{
 		if ( !other.Tags.Has( "player" ) ) return;
 		isInDeathzone = false;
-		exitDeathZone = 0;
 	}
 
 	private void DeathZoneDamage()
@@ -92,6 +87,10 @@ public sealed class DeathZoneManager : Component, Component.ITriggerListener
 
 	private void SetupColliders()
 	{
+		_leftSide = GameObject.AddComponent<BoxCollider>();
+		_rightSide = GameObject.AddComponent<BoxCollider>();
+		_bottomSide = GameObject.AddComponent<BoxCollider>();
+
 		_leftSide.IsTrigger = true;
 		_rightSide.IsTrigger = true;
 		_bottomSide.IsTrigger = true;
@@ -99,5 +98,53 @@ public sealed class DeathZoneManager : Component, Component.ITriggerListener
 		_leftSide.Scale = CollidersScale;
 		_rightSide.Scale = CollidersScale;
 		_bottomSide.Scale = new Vector3( CollidersScale.x, _platformManager.BoxScale.y * PixelsPerUnit, CollidersScale.z );
+	}
+
+	private void SetupColliderModel()
+	{
+		_leftSideGo = new()
+		{
+			Name = "death_zone_left_side",
+			Parent = GameObject
+		};
+		_rightSideGo = new()
+		{
+			Name = "death_zone_right_side",
+			Parent = GameObject
+		};
+		_bottomSideGo = new()
+		{
+			Name = "death_zone_bottom_side",
+			Parent = GameObject
+		};
+
+		float platformHalfWidth = _platformManager.BoxScale.y * PixelsPerUnit * 0.5f;
+		float platformHalfHeight = _platformManager.BoxScale.z * PixelsPerUnit * 0.5f;
+		float colliderHalfWidth = CollidersScale.y * 0.5f;
+		float colliderHalfHeight = CollidersScale.z * 0.5f;
+
+		_leftSideGo.WorldPosition = new Vector3( 0, -(platformHalfWidth + colliderHalfWidth), GameObject.WorldPosition.z );
+		_rightSideGo.WorldPosition = new Vector3( 0, platformHalfWidth + colliderHalfWidth, GameObject.WorldPosition.z );
+		_bottomSideGo.WorldPosition = new Vector3( 0, 0, GameObject.WorldPosition.z - (platformHalfHeight + colliderHalfHeight) );
+
+		_leftSideGo.LocalScale = CollidersScale;
+		_rightSideGo.LocalScale = CollidersScale;
+		_bottomSideGo.LocalScale = new Vector3( CollidersScale.x, _platformManager.BoxScale.y * PixelsPerUnit, CollidersScale.z );
+
+		ModelRenderer leftSideModel = _leftSideGo.AddComponent<ModelRenderer>();
+		leftSideModel.Model = BoxModel;
+		leftSideModel.LocalScale = new Vector3( 1, _leftSideGo.LocalScale.y / (PixelsPerUnit * 0.5f), _leftSideGo.LocalScale.z / (PixelsPerUnit * 0.5f) );
+		leftSideModel.Tint = new Color( 1f, 0f, 0f, 0.22f );
+
+		ModelRenderer rightSideModel = _rightSideGo.AddComponent<ModelRenderer>();
+		rightSideModel.Model = BoxModel;
+		rightSideModel.LocalScale = new Vector3( 1, _rightSideGo.LocalScale.y / (PixelsPerUnit * 0.5f), _rightSideGo.LocalScale.z / (PixelsPerUnit * 0.5f) );
+		rightSideModel.Tint = new Color( 1f, 0f, 0f, 0.22f );
+
+		ModelRenderer bottomSideModel = _bottomSideGo.AddComponent<ModelRenderer>();
+		bottomSideModel.Model = BoxModel;
+		bottomSideModel.LocalScale = new Vector3( 1, _bottomSideGo.LocalScale.y / (PixelsPerUnit * 0.5f), _bottomSideGo.LocalScale.z / (PixelsPerUnit * 0.5f) );
+		bottomSideModel.Tint = new Color( 1f, 0f, 0f, 0.22f );
+
 	}
 }

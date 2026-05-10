@@ -7,6 +7,7 @@ public sealed class PlatformManager : Component
 	[Property] GameObject PlatformPrefab { get; set; }
 	[Property] public Vector3 BoxScale { get; set; } = new Vector3( 1, 10, 5 );
 	[Property] int MaxSumToRange { get; set; } = 5;
+	[Property] float DistanceToNextPlatform { get; set; } = 450;
 	private TimeSince _gameStart { get; set; }
 	private TimeUntil _nextPlatformSpawn { get; set; }
 	private WorldPanel _worldPanel { get; set; }
@@ -36,7 +37,11 @@ public sealed class PlatformManager : Component
 
 	private void SetupBox()
 	{
-		_worldPanel.AddComponent<PlatformManagerUi>();
+		if ( ShowDebug )
+		{
+			_worldPanel.AddComponent<PlatformManagerUi>();
+		}
+
 		GameObject.WorldScale = BoxScale;
 	}
 
@@ -96,12 +101,12 @@ public sealed class PlatformManager : Component
 
 			if ( ShowDebug )
 			{
-				Log.Info( $"distanceWithLastPlatform: {distanceWithLastPlatform}, {distanceWithLastPlatform >= 500}" );
+				Log.Info( $"distanceWithLastPlatform: {distanceWithLastPlatform}, {distanceWithLastPlatform >= DistanceToNextPlatform}" );
 				DebugOverlay.Trace( horizontalTrace, 1 );
 				DebugOverlay.Trace( verticalTrace, 1 );
 			}
 
-			if ( horizontalTrace.Hit || verticalTrace.Hit || (distanceWithLastPlatform >= 500) ) continue;
+			if ( horizontalTrace.Hit || verticalTrace.Hit || (distanceWithLastPlatform >= DistanceToNextPlatform) ) continue;
 
 			_lastPlatform = randomPos;
 			PlatformPrefab.Clone( randomPos );

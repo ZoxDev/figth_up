@@ -92,7 +92,7 @@ public sealed class PlayerController2D : Component, Component.INetworkSpawn, Com
 		}
 		else
 		{
-			CharacterController.Velocity += gravity * Time.Delta * 2;
+			CharacterController.Velocity += gravity * Time.Delta * 7.5f;
 			CharacterController.Accelerate( wishVelocity );
 			CharacterController.ApplyFriction( AirFriction );
 		}
