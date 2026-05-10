@@ -49,7 +49,7 @@ public sealed class PlatformManager : Component
 
 	record XCord( int Left, int Right );
 	record YCord( int Top, int Bottom );
-	private int _lastPlatformOnY { get; set; }
+	private Vector3 _lastPlatform { get; set; }
 	const int MAX_ATTEMPTS = 20;
 	private void SpawnPlatform()
 	{
@@ -63,12 +63,8 @@ public sealed class PlatformManager : Component
 		int top = (int)Math.Round( GameObject.WorldPosition.z + halfHeight );
 		int bottom = (int)Math.Round( GameObject.WorldPosition.z - halfHeight );
 
-		Log.Info( $"left: {left}, right: {right}" );
-		Log.Info( $"top: {top}, bottom: {bottom}" );
-
-
 		XCord xCord = new( left, right );
-		YCord yCord = new( top, bottom > _lastPlatformOnY ? bottom : _lastPlatformOnY );
+		YCord yCord = new( top, bottom > (int)Math.Round( _lastPlatform.z ) ? bottom : (int)Math.Round( _lastPlatform.z ) );
 
 		Random random = new();
 
@@ -95,17 +91,20 @@ public sealed class PlatformManager : Component
 				.HitTriggers()
 				.Run();
 
+			Vector3 randomPos = new( 0, randomX, randomY );
+			float distanceWithLastPlatform = Vector3.DistanceBetween( _lastPlatform, randomPos );
+
 			if ( ShowDebug )
 			{
-				DebugOverlay.Line( new Line( horizontalTraceFrom, horizontalTraceTo ), Color.Orange, 5f );
-				DebugOverlay.Line( new Line( verticalTraceFrom, verticalTraceTo ), Color.Orange, 5f );
+				Log.Info( $"distanceWithLastPlatform: {distanceWithLastPlatform}, {distanceWithLastPlatform >= 500}" );
+				DebugOverlay.Trace( horizontalTrace, 1 );
+				DebugOverlay.Trace( verticalTrace, 1 );
 			}
 
-			if ( horizontalTrace.Hit || verticalTrace.Hit )
-				continue;
+			if ( horizontalTrace.Hit || verticalTrace.Hit || (distanceWithLastPlatform >= 500) ) continue;
 
-			_lastPlatformOnY = randomY;
-			PlatformPrefab.Clone( new Vector3( 0, randomX, randomY ) );
+			_lastPlatform = randomPos;
+			PlatformPrefab.Clone( randomPos );
 
 			return;
 		}

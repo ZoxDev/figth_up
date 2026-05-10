@@ -61,7 +61,7 @@ public sealed class PlayerController2D : Component, Component.INetworkSpawn, Com
 			Jump();
 		}
 
-		if ( Input.Pressed( "Backward" ) && !CharacterController.IsOnGround )
+		if ( Input.Pressed( "Backward" ) && !CharacterController.IsOnGround && !isFastFalling )
 		{
 			FastFall();
 		}

@@ -1,6 +1,5 @@
 
 ### player
-- bug: can spam fastfal
 - death
 
 ### platform
@@ -9,14 +8,11 @@
 - textures
 - different types ? 
 
-### platform-manager
-- check if it's always reachable (jump + going left / right ) + log
-
 ### death zone
-- implement death zone
+- 3. implement death zone
 
 ### multiplayer
-- implement multiplayer
+- 4. implement multiplayer
 
 ### game loop
 - implement game start (min 2 palyers)
