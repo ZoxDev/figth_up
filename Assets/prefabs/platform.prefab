@@ -4,7 +4,7 @@
     "__version": 2,
     "Flags": 0,
     "Name": "platform",
-    "Position": "0,0,0",
+    "Position": "0,0.0543767512,0",
     "Rotation": "0,0,0,1",
     "Scale": "0.5,1.5,0.5",
     "Tags": "platform",
@@ -47,6 +47,12 @@
         "__guid": "609ae207-c1bd-4692-85cd-56a7cb41bc36",
         "__enabled": true,
         "Flags": 0,
+        "GateColliderBox": {
+          "_type": "component",
+          "component_id": "1717aa64-d65b-4d21-a771-61aa2979adeb",
+          "go": "719c35ab-214b-476e-a123-01c88765449b",
+          "component_type": "BoxCollider"
+        },
         "Health": 4,
         "OnComponentDestroy": null,
         "OnComponentDisabled": null,
@@ -108,7 +114,7 @@
         "OnTriggerEnter": null,
         "OnTriggerExit": null,
         "RollingResistance": null,
-        "Scale": "125,150,50",
+        "Scale": "125,150,100",
         "Static": false,
         "Surface": null,
         "SurfaceVelocity": "0,0,0"

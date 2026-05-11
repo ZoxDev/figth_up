@@ -7,8 +7,6 @@ public sealed class PlayerCombat : Component, Component.IDamageable
 	[Property] public float Health { get; set; } = 100;
 	[Property] CitizenAnimationHelper AnimationHelper { get; set; }
 	[Property] CharacterController CharacterController { get; set; }
-	[Property] CharacterController Body { get; set; }
-
 
 	TimeUntil nextAttack = 0;
 	protected override void OnUpdate()

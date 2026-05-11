@@ -1,20 +1,27 @@
 # IN PROGRESS
-- bug death zone: no damage / trigger fucked can't fast fall + damage to platforms
+### platform
+- bug platform take damages by just hitting it on the side (collision + bones = foot)
+### multiplayer
+- implement multiplayer
+### platform
+- on update trigger
 
+# TODO
 ### player
 - bug: fast fall can't trigger on death zone
+- do a ledge grab if the player is half body in the platform for 0.5 ledge anim + go on the platform if he is less just tp him on top of it
 - death
 - dash
+- dash particules
 - double jump
+- jump particules
 - red blink animation damages
-- ledge grab
+- wall jummp (anim grab)
 
 ### combat
 - bounce on player head
 
 ### platform
-- bug: player too fast can't open the trigger
-- bug: platform lose health because of the death zone ensure trigger is player
 - on update trigger
 - smaller platform
 - textures
@@ -25,11 +32,12 @@
     - platform with life time
 
 ### platform-manager
-- going to fast 
-- spawn platform before player reaches it ?
-- scale on player amount 
 - bug: still some unreachable platforms
 - bug: platform can't spawn on the edges (except the wall one)
+- spawn platform before player reaches it ?
+- going to fast 
+- scale on player amount 
+- idea: deah zone surround you can't see platform spawn their already there so no next platform time. for each platform assume that there is no plaform near 450 units
 
 ### items
 - implement
@@ -41,9 +49,10 @@
 - grapplin
 
 ### death zone
+- one on the top because the platform spawn before now ? 
 
 ### multiplayer
-- 4. implement multiplayer
+- implement multiplayer
 
 ### game loop
 - implement game start (min 2 palyers)
