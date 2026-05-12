@@ -1,6 +1,6 @@
 # IN PROGRESS
-### platform
-- bug platform take damages by just hitting it on the side (collision + bones = foot)
+### platform-manager
+- bug: still some unreachable platforms
 ### multiplayer
 - implement multiplayer
 ### platform
@@ -22,9 +22,6 @@
 - bounce on player head
 
 ### platform
-- on update trigger
-- smaller platform
-- textures
 - different types 
     - moving platforms
     - wall platforms
@@ -33,7 +30,7 @@
 
 ### platform-manager
 - bug: still some unreachable platforms
-- bug: platform can't spawn on the edges (except the wall one)
+- platform can't spawn on the edges (except the wall one)
 - spawn platform before player reaches it ?
 - going to fast 
 - scale on player amount 

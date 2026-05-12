@@ -21,6 +21,35 @@ public sealed class PlatformCollider : Component, Component.ITriggerListener, Co
 		CheckPlatformTrigger();
 	}
 
+	void ITriggerListener.OnTriggerExit( GameObject other )
+	{
+		if ( !playerOnPlatform ) return;
+		Health--;
+		playerOnPlatform = false;
+	}
+
+	bool playerOnPlatform;
+	float heightDiff;
+	void ICollisionListener.OnCollisionStart( Collision collision )
+	{
+		GameObject go = collision.Other.GameObject;
+		if ( !go.Tags.Has( "player" ) || go.IsProxy ) return;
+
+		CharacterController characterController = go.GetComponentInParent<CharacterController>();
+		heightDiff = go.WorldPosition.z - GameObject.WorldPosition.z;
+
+		if ( heightDiff >= 0 && heightDiff <= 15 ) playerOnPlatform = true;
+
+		bool isPlayerStuck = IsPlayerStuck( characterController );
+		if ( isPlayerStuck )
+		{
+			if ( heightDiff >= -70 && heightDiff <= 5 )
+			{
+				go.WorldPosition = new Vector3( go.WorldPosition.x, go.WorldPosition.y, GameObject.WorldPosition.z + 10f );
+			}
+		}
+	}
+
 	private void CheckPlatformTrigger()
 	{
 		foreach ( var collider in GateColliderBox.Touching )
@@ -43,17 +72,17 @@ public sealed class PlatformCollider : Component, Component.ITriggerListener, Co
 		}
 	}
 
-	void ITriggerListener.OnTriggerExit( GameObject other )
+	Vector3 lastPlayerKnownPosition;
+	private bool IsPlayerStuck( CharacterController characterController )
 	{
-		if ( !_playerOnPlatform ) return;
-		Health--;
-		_playerOnPlatform = false;
-	}
+		Vector3 playerPosition = characterController.GameObject.WorldPosition;
+		if ( playerPosition == lastPlayerKnownPosition )
+		{
+			lastPlayerKnownPosition = characterController.GameObject.WorldPosition;
+			return true;
+		}
 
-	private bool _playerOnPlatform;
-	void ICollisionListener.OnCollisionStart( Collision collision )
-	{
-		float heightDiff = collision.Other.GameObject.WorldPosition.z - GameObject.WorldPosition.z;
-		if ( heightDiff >= 0 && heightDiff <= 15 ) _playerOnPlatform = true;
+		lastPlayerKnownPosition = characterController.GameObject.WorldPosition;
+		return false;
 	}
 }
