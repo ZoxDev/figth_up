@@ -1,12 +1,12 @@
 # IN PROGRESS
-### player
-- death
-- dash
 ### multiplayer
 - implement multiplayer
 
 # TODO
 ### player
+- jump to big
+- too much gravity
+- death
 - dash particules
 - jump particules
 - red blink animation damages
@@ -24,9 +24,10 @@
 
 ### platform-manager
 - bug: still some unreachable platforms
+- more platform / less space between them
+- going to fast
 - platform can't spawn on the edges (except the wall one)
 - spawn platform before player reaches it ?
-- going to fast 
 - scale on player amount 
 - idea: deah zone surround you can't see platform spawn their already there so no next platform time. for each platform assume that there is no plaform near 450 units
 
@@ -40,7 +41,7 @@
 - grapplin
 
 ### death zone
-- one on the top because the platform spawn before now ? 
+- one on the top because the platform spawn before now
 
 ### multiplayer
 - implement multiplayer

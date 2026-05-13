@@ -66,6 +66,30 @@ public sealed class PlayerController2D : Component, Component.INetworkSpawn, Com
 		{
 			FastFall();
 		}
+
+		if ( Input.Pressed( "Run" ) && canDash )
+		{
+			Dash();
+		}
+		if ( isDashing )
+		{
+			dashTimer += Time.Delta;
+			float t = dashTimer / dashTime;
+			Log.Info( t );
+			t = t * t * (2f - 1f * t);
+			GameObject.WorldPosition = Vector3.Lerp(
+				dashStart,
+				dashTarget,
+				t
+			);
+
+			if ( t >= 1f )
+			{
+				isDashing = false;
+				GameObject.WorldPosition = dashTarget;
+			}
+		}
+
 		if ( isFastFalling && CharacterController.IsOnGround )
 		{
 			AnimationHelper.SpecialMove = CitizenAnimationHelper.SpecialMoveStyle.None;
@@ -166,4 +190,28 @@ public sealed class PlayerController2D : Component, Component.INetworkSpawn, Com
 		AnimationHelper.SpecialMove = CitizenAnimationHelper.SpecialMoveStyle.Roll;
 		AnimationHelper.HoldType = CitizenAnimationHelper.HoldTypes.None;
 	}
+
+	TimeUntil canDash;
+	Vector3 dashStart;
+	Vector3 dashTarget;
+	bool isDashing;
+	float dashTime = 0.1f;
+	float dashTimer;
+	void Dash()
+	{
+		canDash = 1f;
+		if ( isDashing ) return;
+
+		Vector3 dir = -Input.AnalogMove.Normal;
+
+		if ( dir.Length == 0 )
+			return;
+
+		dashStart = GameObject.WorldPosition;
+		dashTarget = dashStart + dir * 150;
+
+		dashTimer = 0f;
+		isDashing = true;
+	}
+
 }
