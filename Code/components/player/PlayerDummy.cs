@@ -10,7 +10,5 @@ public sealed class PlayerDummy : Component, Component.IDamageable
 	{
 		Health -= damage.Damage;
 		AnimationHelper.ProceduralHitReaction( damage );
-
-		Log.Info( Health );
 	}
 }

@@ -24,6 +24,9 @@ public sealed class PlatformCollider : Component, Component.ITriggerListener, Co
 	void ITriggerListener.OnTriggerExit( GameObject other )
 	{
 		if ( !playerOnPlatform ) return;
+		var playController = other.GetComponent<PlayerController2D>();
+		playController.hasDoubleJunp = true;
+
 		Health--;
 		playerOnPlatform = false;
 	}

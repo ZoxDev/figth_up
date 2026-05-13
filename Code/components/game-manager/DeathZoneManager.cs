@@ -1,3 +1,4 @@
+using System.Diagnostics.Contracts;
 using System.Dynamic;
 
 using Sandbox;
@@ -6,16 +7,16 @@ public sealed class DeathZoneManager : Component, Component.ITriggerListener
 {
 	[Property] Vector3 CollidersScale { get; set; }
 	[Property] Model BoxModel { get; set; }
+	[Property] TagSet GameObjectTag { get; set; }
 	private PlatformManager _platformManager;
-	private TimeSince _gameStart;
 	private BoxCollider _leftSide;
 	private BoxCollider _rightSide;
 	private BoxCollider _bottomSide;
 	private PlayerCombat _playerCombat;
-	const float PixelsPerUnit = 100f;
 	private GameObject _leftSideGo;
 	private GameObject _rightSideGo;
 	private GameObject _bottomSideGo;
+	const float PixelsPerUnit = 100f;
 
 	protected override void OnStart()
 	{
@@ -26,8 +27,6 @@ public sealed class DeathZoneManager : Component, Component.ITriggerListener
 			Log.Error( "no platform_manager found" );
 			return;
 		}
-
-		_gameStart = 0;
 
 		SetupColliders();
 		SetupColliderModel();
@@ -105,7 +104,7 @@ public sealed class DeathZoneManager : Component, Component.ITriggerListener
 		_leftSideGo = new()
 		{
 			Name = "death_zone_left_side",
-			Parent = GameObject
+			Parent = GameObject,
 		};
 		_rightSideGo = new()
 		{
@@ -122,6 +121,10 @@ public sealed class DeathZoneManager : Component, Component.ITriggerListener
 		float platformHalfHeight = _platformManager.BoxScale.z * PixelsPerUnit * 0.5f;
 		float colliderHalfWidth = CollidersScale.y * 0.5f;
 		float colliderHalfHeight = CollidersScale.z * 0.5f;
+
+		_leftSideGo.Tags.Add( GameObjectTag );
+		_rightSideGo.Tags.Add( GameObjectTag );
+		_bottomSideGo.Tags.Add( GameObjectTag );
 
 		_leftSideGo.WorldPosition = new Vector3( 0, -(platformHalfWidth + colliderHalfWidth), GameObject.WorldPosition.z );
 		_rightSideGo.WorldPosition = new Vector3( 0, platformHalfWidth + colliderHalfWidth, GameObject.WorldPosition.z );

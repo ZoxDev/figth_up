@@ -1,19 +1,13 @@
 # IN PROGRESS
-### platform-manager
-- bug: still some unreachable platforms
+### player
+- death
+- dash
 ### multiplayer
 - implement multiplayer
-### platform
-- on update trigger
 
 # TODO
 ### player
-- bug: fast fall can't trigger on death zone
-- do a ledge grab if the player is half body in the platform for 0.5 ledge anim + go on the platform if he is less just tp him on top of it
-- death
-- dash
 - dash particules
-- double jump
 - jump particules
 - red blink animation damages
 - wall jummp (anim grab)

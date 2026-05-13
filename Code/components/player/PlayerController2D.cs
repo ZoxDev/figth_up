@@ -17,6 +17,7 @@ public sealed class PlayerController2D : Component, Component.INetworkSpawn, Com
 
 	[RequireComponent] CharacterController CharacterController { get; set; }
 
+	public bool hasDoubleJunp;
 	public const float EYE_POSITION_Z = 60f;
 
 	private GameObject _body { get; set; }
@@ -56,7 +57,7 @@ public sealed class PlayerController2D : Component, Component.INetworkSpawn, Com
 		var wishVelocity = getWishVelocity();
 		Move( wishVelocity );
 
-		if ( Input.Pressed( "Jump" ) && CharacterController.IsOnGround )
+		if ( Input.Pressed( "Jump" ) && (CharacterController.IsOnGround || hasDoubleJunp) )
 		{
 			Jump();
 		}
@@ -135,8 +136,11 @@ public sealed class PlayerController2D : Component, Component.INetworkSpawn, Com
 
 	void Jump()
 	{
+		if ( hasDoubleJunp ) CharacterController.Velocity = new Vector3( CharacterController.Velocity.x, CharacterController.Velocity.y, 0 );
 		CharacterController.Punch( Vector3.Up * JumpForce );
+
 		AnimationHelper.TriggerJump();
+		hasDoubleJunp = !hasDoubleJunp;
 	}
 
 	bool isFastFalling { get; set; } = false;
@@ -151,6 +155,8 @@ public sealed class PlayerController2D : Component, Component.INetworkSpawn, Com
 			.WithoutTags( ["player"] )
 			.HitTriggers()
 			.Run();
+
+		Log.Info( trace.Hit );
 
 		if ( trace.Hit ) return;
 
